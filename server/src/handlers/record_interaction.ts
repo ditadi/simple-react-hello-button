@@ -1,12 +1,21 @@
 
+import { db } from '../db';
+import { buttonInteractionsTable } from '../db/schema';
 import { type RecordInteractionInput, type ButtonInteraction } from '../schema';
 
 export const recordInteraction = async (input: RecordInteractionInput): Promise<ButtonInteraction> => {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is recording button interaction events for analytics.
-    return Promise.resolve({
-        id: 1,
-        interaction_type: input.interaction_type,
-        timestamp: new Date()
-    } as ButtonInteraction);
-}
+  try {
+    // Insert interaction record
+    const result = await db.insert(buttonInteractionsTable)
+      .values({
+        interaction_type: input.interaction_type
+      })
+      .returning()
+      .execute();
+
+    return result[0];
+  } catch (error) {
+    console.error('Recording interaction failed:', error);
+    throw error;
+  }
+};
